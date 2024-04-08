@@ -3,9 +3,11 @@ package com.assignment.Task_Exam.Controller;
 import com.assignment.Task_Exam.model.Book;
 import com.assignment.Task_Exam.dao.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,22 +33,33 @@ public class BookController {
         }
     }
 
-    @PostMapping("insert_book")
-    public ResponseEntity<Book> createBook(@RequestBody Book book) {
+    @PostMapping("/insert_books")
+    public ResponseEntity<Book> insertBook(@RequestBody Book book) {
         Book savedBook = bookRepository.save(book);
-        return ResponseEntity.ok(savedBook);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);
     }
 
+
+
     @PutMapping("/{bookId}")
-    public ResponseEntity<Book> updateBook(@PathVariable Long bookId, @RequestBody Book book) {
-        if (bookRepository.existsById(bookId)) {
-            book.setId(bookId);
-            Book updatedBook = bookRepository.save(book);
-            return ResponseEntity.ok(updatedBook);
+    public ResponseEntity<List<Book>> updateBooks(@RequestBody List<Book> books) {
+        List<Book> updatedBooks = new ArrayList<>();
+
+        for (Book book : books) {
+            Long bookId = book.getId();
+            if (bookId != null && bookRepository.existsById(bookId)) {
+                Book updatedBook = bookRepository.save(book);
+                updatedBooks.add(updatedBook);
+            }
+        }
+
+        if (!updatedBooks.isEmpty()) {
+            return ResponseEntity.ok(updatedBooks);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
+
 
     @DeleteMapping("/{bookId}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long bookId) {

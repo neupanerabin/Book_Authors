@@ -1,6 +1,4 @@
 package com.assignment.Task_Exam.model;
-
-
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -46,11 +44,12 @@ public class Book {
         this.authors = authors;
     }
 
-    @ManyToMany
-    @JoinTable(name="authors_books",
-                joinColumns = @JoinColumn(name="book_id"),
-                inverseJoinColumns = @JoinColumn(name="author_id"))
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name="book_authors",
+            joinColumns = @JoinColumn(name="book_id"),
+            inverseJoinColumns = @JoinColumn(name="author_id"))
     private Set<Author> authors = new HashSet<>();
+
 
 
 }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,20 +32,32 @@ public class AuthorController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<Author> createAuthor(@RequestBody Author author) {
-        Author savedAuthor = authorRepository.save(author);
-        return ResponseEntity.ok(savedAuthor);
+    public ResponseEntity<List<Author>> createAuthors(@RequestBody List<Author> authors) {
+        List<Author> savedAuthors = new ArrayList<>();
+
+        for (Author author : authors) {
+            Author savedAuthor = authorRepository.save(author);
+            savedAuthors.add(savedAuthor);
+        }
+
+        return ResponseEntity.ok(savedAuthors);
     }
+
 
     @PutMapping("/{authorId}")
     public ResponseEntity<Author> updateAuthor(@PathVariable Long authorId, @RequestBody Author author) {
-        if (!authorRepository.existsById(authorId)) {
+        if (authorId == null || !authorRepository.existsById(authorId)) {
             return ResponseEntity.notFound().build();
         }
-        author.setId(authorId); // Ensure the ID is set for update
+
+        // Ensure the ID is set for update
+        author.setId(authorId);
+
         Author updatedAuthor = authorRepository.save(author);
         return ResponseEntity.ok(updatedAuthor);
     }
+
+
 
     @DeleteMapping("/{authorId}")
     public ResponseEntity<Void> deleteAuthor(@PathVariable Long authorId) {
