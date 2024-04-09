@@ -33,13 +33,9 @@ public class AuthorController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<List<Author>> createAuthors(@RequestBody List<Author> authors) {
-        List<Author> savedAuthors = new ArrayList<>();
-        for (Author author : authors) {
-            Author savedAuthor = authorRepository.save(author);
-            savedAuthors.add(savedAuthor);
-        }
-        return ResponseEntity.ok(savedAuthors);
+    public ResponseEntity<Author> insertBook(@RequestBody Author author){
+        Author savedAuthor = authorRepository.save(author);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedAuthor);
     }
 
 
