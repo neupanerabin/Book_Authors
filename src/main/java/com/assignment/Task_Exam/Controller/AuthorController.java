@@ -3,6 +3,7 @@ package com.assignment.Task_Exam.Controller;
 import com.assignment.Task_Exam.dao.AuthorRepository;
 import com.assignment.Task_Exam.model.Author;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,23 +26,22 @@ public class AuthorController {
     @GetMapping("/{authorId}")
     public ResponseEntity<Author> getAuthorById(@PathVariable Long authorId) {
         Optional<Author> author = authorRepository.findById(authorId);
-        if (author.isEmpty()) {
-            return ResponseEntity.notFound().build();
+        if (author.isPresent()) {
+            return ResponseEntity.ok(author.get());
         }
-        return ResponseEntity.ok(author.get());
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping("/save")
     public ResponseEntity<List<Author>> createAuthors(@RequestBody List<Author> authors) {
         List<Author> savedAuthors = new ArrayList<>();
-
         for (Author author : authors) {
             Author savedAuthor = authorRepository.save(author);
             savedAuthors.add(savedAuthor);
         }
-
         return ResponseEntity.ok(savedAuthors);
     }
+
 
 
     @PutMapping("/{authorId}")
@@ -58,13 +58,22 @@ public class AuthorController {
     }
 
 
-
     @DeleteMapping("/{authorId}")
     public ResponseEntity<Void> deleteAuthor(@PathVariable Long authorId) {
         if (!authorRepository.existsById(authorId)) {
             return ResponseEntity.notFound().build();
         }
-        authorRepository.deleteById(authorId);
-        return ResponseEntity.noContent().build();
+        try {
+            authorRepository.deleteById(authorId);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
+
+
+
+
+
 }
+
