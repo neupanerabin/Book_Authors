@@ -54,7 +54,7 @@ public class AuthorController {
         return ResponseEntity.ok(updatedAuthor);    // return the updated author
     }
 
-    // Delete Authors by Id
+    // Delete Authors by id
     @DeleteMapping("/{authorId}")
     public ResponseEntity<Void> deleteAuthor(@PathVariable Long authorId) {
         // check if the id is available in the database or not

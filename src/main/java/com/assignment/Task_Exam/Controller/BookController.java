@@ -1,15 +1,15 @@
 package com.assignment.Task_Exam.Controller;
 
 // Imports class and library
-import com.assignment.Task_Exam.model.Book;
-import com.assignment.Task_Exam.dao.BookRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.assignment.Task_Exam.model.Book;  // Importing Book model class
+import com.assignment.Task_Exam.dao.BookRepository;  // Importing author repository for accessing data
+import org.springframework.beans.factory.annotation.Autowired;  // Importing Spring's Autowired annotation for dependency injection
+import org.springframework.http.HttpStatus; // Importing HttpStatus for HTTP status code
+import org.springframework.http.ResponseEntity;     // Importing ResponseEntity for handling responses
+import org.springframework.web.bind.annotation.*;   // // Importing annotations for creating RESTful APIs
+import java.util.ArrayList; // Importing ArrayList for collections
+import java.util.List;  // Importing list for Collections
+import java.util.Optional;  // Importing Optional for handling potentially null values
 
 // Create API
 @RestController
@@ -28,9 +28,9 @@ public class BookController {
     // Get Book with ID
     @GetMapping("/{bookId}")
     public ResponseEntity<Book> getBookById(@PathVariable Long bookId) {
-        Optional<Book> optionalBook = bookRepository.findById(bookId);  // Find the book by ID the repository
-        if (optionalBook.isPresent()) { // Check if book is present
-            return ResponseEntity.ok(optionalBook.get());   // return the book if found
+        Optional<Book> book = bookRepository.findById(bookId);  // Find the book by ID the repository
+        if (book.isPresent()) { // Check if book is present
+            return ResponseEntity.ok(book.get());   // return the book if found
         } else {
             return ResponseEntity.notFound().build();   // Return 404 not found
         }
@@ -62,7 +62,7 @@ public class BookController {
         }
     }
 
-    // Delete Book with book Id
+    // Delete Book with book id
     @DeleteMapping("/{bookId}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long bookId) {
         if (bookRepository.existsById(bookId)) {    // Check if book ID exists in the repository
