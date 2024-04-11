@@ -1,44 +1,58 @@
 package com.assignment.Task_Exam.model;
-import static org.mockito.Mockito.*;
 
-import com.assignment.Task_Exam.dao.AuthorRepository;
-import com.assignment.Task_Exam.dao.BookRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-public class AuthorTest {
+class AuthorTest {
 
-    @Autowired
-//    private Author authorService;
-
-    @MockBean
-    private AuthorRepository authorRepository;
-
-    @MockBean
-    private BookRepository bookRepository;
-
-    @Test
-    public void testAddBookToAuthor() {
-        Author author = new Author();
-        author.setId(1L);
-        author.setName("Test Author");
-
-        Book book = new Book();
-        book.setId(1L);
-        book.setTitle("Test Book");
-
-        when(authorRepository.findById(1L)).thenReturn(Optional.of(author));
-        when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
-
-//        authorService.addBook( "Book");
-
-        verify(authorRepository, times(1)).save(author);
+    @BeforeEach
+    void setUp() {
     }
 
-    // Add more tests for other service methods
+    @AfterEach
+    void tearDown() {
+    }
+
+    @Test
+    void getId() {
+    }
+
+    @Test
+    void setId() {
+    }
+
+    @Test
+    void getName() {
+    }
+
+    @Test
+    void setName() {
+    }
+
+    @Test
+    void getBooks() {
+    }
+
+    @Test
+    void setBooks() {
+    }
+
+    @Test
+    void addBook() {
+    }
+
+    @Test
+    void removeBook() {
+    }
+
+    @Test
+    void testEquals() {
+    }
+
+    @Test
+    void testHashCode() {
+    }
 }
