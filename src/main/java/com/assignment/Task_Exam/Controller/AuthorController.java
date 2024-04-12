@@ -2,13 +2,16 @@ package com.assignment.Task_Exam.Controller;
 
 // Import the necessary library and packages
 import com.assignment.Task_Exam.dao.AuthorRepository;   // Importing author repository for accessing author data
+import com.assignment.Task_Exam.dao.BookRepository;
 import com.assignment.Task_Exam.model.Author;   // Importing author model class
+import com.assignment.Task_Exam.model.Book;
 import org.springframework.beans.factory.annotation.Autowired;  //Importing Spring's Autowired annotation for dependency injection
 import org.springframework.http.HttpStatus; // Importing HttpStatus for HTTP status code
 import org.springframework.http.ResponseEntity; // Importing ResponseEntity for handling HTTP responses
 import org.springframework.web.bind.annotation.*; // Importing annotations for creating RESTful APIs
 import java.util.List;  // importing list for collections
 import java.util.Optional;  // Importing Optional for handling potentially null values
+
 
 // Controller and API create
 @RestController
@@ -17,6 +20,9 @@ public class AuthorController {
 
     @Autowired  // Autowire AuthorRepository for dependency injection
     AuthorRepository authorRepository;  // create object of AuthorRepository
+
+    @Autowired
+    BookRepository bookRepository;
 
     // Get all the available lists on here
     @GetMapping("/list-authors")
@@ -53,6 +59,37 @@ public class AuthorController {
         Author updatedAuthor = authorRepository.save(author);   // update the authors in the repository
         return ResponseEntity.ok(updatedAuthor);    // return the updated author
     }
+
+    // Remove a Book from an Author
+    @DeleteMapping("/{authorId}/books/{bookId}")
+    public ResponseEntity<Void> deleteBookFromAuthor(@PathVariable Long authorId, @PathVariable Long bookId) {
+        Optional<Author> optionalAuthor = authorRepository.findById(authorId);
+        Optional<Book> optionalBook = bookRepository.findById(bookId);
+
+        if (optionalAuthor.isPresent() && optionalBook.isPresent()) {
+            Author author = optionalAuthor.get();
+            Book book = optionalBook.get();
+
+            // Check if the book belongs to the author
+            if (author.getBooks().contains(book)) {
+                // Remove the book from the author's list of books
+                author.getBooks().remove(book);
+
+                // Delete the book from the repository
+                bookRepository.delete(book);
+
+                return ResponseEntity.noContent().build(); // Return 204 No Content after successful deletion
+            } else {
+                return ResponseEntity.badRequest().build(); // Return 400 Bad Request if book does not belong to author
+            }
+        } else {
+            return ResponseEntity.notFound().build(); // Return 404 Not Found if author or book is not found
+        }
+    }
+
+
+
+
 
     // Delete Authors by id
     @DeleteMapping("/{authorId}")

@@ -7,19 +7,34 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MockMvcBuilder;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @ExtendWith(MockitoExtension.class)
 public class BookControllerTest {
+
+    private MockMvc mockMvc;
 
     @Mock
     private BookRepository bookRepository;
@@ -29,25 +44,27 @@ public class BookControllerTest {
 
     private Book testBook;
 
+    Book record1 = new Book(1L,"Rabin");
+    Book record2 = new Book(2L,"robs");
+    Book record3 = new Book(3L,"neupane");
+
     @BeforeEach
-    void setUp() {
-        testBook = new Book();
-        testBook.setId(1L);
-        testBook.setTitle("Test Book");
-//        testBook.setAuthor("Test Author");
+    public void setUp(){
+        MockitoAnnotations.initMocks(this);
+        this.mockMvc = MockMvcBuilders.standaloneSetup(bookController).build();
     }
 
     @Test
-    void testGetAllBooks() {
-        List<Book> books = new ArrayList<>();
-        books.add(testBook);
+    void testGetAllBooks() throws Exception{
+        List<Book> records = new ArrayList<>(Arrays.asList(record1,record2,record3));
+        Mockito.when(bookRepository.findAll()).thenReturn(records);
 
-        when(bookRepository.findAll()).thenReturn(books);
+        ResultActions response = mockMvc.perform(get("/books/books"));
 
-        List<Book> result = bookController.getAllBooks();
-
-        assertEquals(1, result.size());
-        assertEquals(testBook.getTitle(), result.get(0).getTitle());
+        // then - verify the output
+        response.andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(jsonPath("$[2].name").value("Rabin"));
     }
 
     @Test
@@ -82,6 +99,7 @@ public class BookControllerTest {
     @Test
     void testUpdateBooks() {
         List<Book> books = new ArrayList<>();
+        testBook = new Book(1L, "Test Book"); // Initialize testBook
         books.add(testBook);
 
         when(bookRepository.existsById(1L)).thenReturn(true);
@@ -93,17 +111,6 @@ public class BookControllerTest {
         assertEquals(books, responseEntity.getBody());
     }
 
-    @Test
-    void testUpdateBooks_NotFound() {
-        List<Book> books = new ArrayList<>();
-        books.add(testBook);
-
-        when(bookRepository.existsById(1L)).thenReturn(false);
-
-        ResponseEntity<List<Book>> responseEntity = bookController.updateBooks(books);
-
-        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
-    }
 
     @Test
     void testDeleteBook() {

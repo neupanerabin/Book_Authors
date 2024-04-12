@@ -1,6 +1,8 @@
 package com.assignment.Task_Exam.Controller;
 
 // Imports class and library
+import com.assignment.Task_Exam.dao.AuthorRepository;
+import com.assignment.Task_Exam.model.Author;
 import com.assignment.Task_Exam.model.Book;  // Importing Book model class
 import com.assignment.Task_Exam.dao.BookRepository;  // Importing author repository for accessing data
 import org.springframework.beans.factory.annotation.Autowired;  // Importing Spring's Autowired annotation for dependency injection
@@ -18,6 +20,9 @@ public class BookController {
 
     @Autowired  // Autowire BookRepository for dependency injection
     private BookRepository bookRepository;
+
+    @Autowired
+    private AuthorRepository authorRepository;
 
     // Get all the available books
     @GetMapping("/books")
@@ -59,6 +64,28 @@ public class BookController {
             return ResponseEntity.ok(updatedBooks); // Return the list of updated books
         } else {
             return ResponseEntity.notFound().build();   // Return 404 not found if no books were updated
+        }
+    }
+
+    // Link an Author to a Book
+    @PostMapping("/{bookId}/authors/{authorId}")
+    public ResponseEntity<Book> linkAuthorToBook(@PathVariable Long bookId, @PathVariable Long authorId) {
+        Optional<Book> optionalBook = bookRepository.findById(bookId);
+        Optional<Author> optionalAuthor = authorRepository.findById(authorId);
+
+        if (optionalBook.isPresent() && optionalAuthor.isPresent()) {
+            Book book = optionalBook.get();
+            Author author = optionalAuthor.get();
+
+            // Add the author to the book's list of authors
+            book.getAuthors().add(author);
+
+            // Save the updated book
+            Book savedBook = bookRepository.save(book);
+
+            return ResponseEntity.ok(savedBook);
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 
