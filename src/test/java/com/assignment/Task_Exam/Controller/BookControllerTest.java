@@ -1,5 +1,6 @@
 package com.assignment.Task_Exam.Controller;
 
+import com.assignment.Task_Exam.dao.AuthorRepository;
 import com.assignment.Task_Exam.dao.BookRepository;
 import com.assignment.Task_Exam.model.Book;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +36,10 @@ public class BookControllerTest {
 
     @Mock
     private BookRepository bookRepository;
+
+    @Mock
+    private AuthorRepository authorRepository;
+
 
     @InjectMocks
     private BookController bookController;
@@ -105,6 +110,16 @@ public class BookControllerTest {
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(books, responseEntity.getBody());
+    }
+
+    @Test
+    void linkAuthorToBook_BookNotFound_ReturnsNotFound() {
+        // Arrange
+        when(bookRepository.findById(any())).thenReturn(Optional.empty());
+        // Act
+        ResponseEntity<Book> response = bookController.linkAuthorToBook(1L, 1L);
+        // Assert
+        assert(response.getStatusCode()).equals(HttpStatus.NOT_FOUND);
     }
 
 
