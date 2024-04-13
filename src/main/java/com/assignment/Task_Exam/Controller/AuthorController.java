@@ -63,6 +63,8 @@ public class AuthorController {
     // Remove a Book from an Author
     @DeleteMapping("/{authorId}/books/{bookId}")
     public ResponseEntity<Void> deleteBookFromAuthor(@PathVariable Long authorId, @PathVariable Long bookId) {
+        System.out.println("Deleting book with ID: " + bookId + " from author with ID: " + authorId);  // Logging
+
         Optional<Author> optionalAuthor = authorRepository.findById(authorId);
         Optional<Book> optionalBook = bookRepository.findById(bookId);
 
@@ -75,19 +77,23 @@ public class AuthorController {
                 // Remove the book from the author's list of books
                 author.getBooks().remove(book);
 
+                // Set the book's author to null to break the association
+                book.setAuthors(null);
+                bookRepository.save(book); // Save the book to update its author association
+
                 // Delete the book from the repository
                 bookRepository.delete(book);
 
                 return ResponseEntity.noContent().build(); // Return 204 No Content after successful deletion
             } else {
+                System.out.println("Book with ID " + bookId + " does not belong to author with ID " + authorId);  // Logging
                 return ResponseEntity.badRequest().build(); // Return 400 Bad Request if book does not belong to author
             }
         } else {
+            System.out.println("Author with ID " + authorId + " or book with ID " + bookId + " not found");  // Logging
             return ResponseEntity.notFound().build(); // Return 404 Not Found if author or book is not found
         }
     }
-
-
 
 
 
